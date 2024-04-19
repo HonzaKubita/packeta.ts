@@ -42,9 +42,9 @@ function onPickupPointSelected(point: PacketaPoint) {
     console.log("Selected point", point);
 }
 
-// Options can be empty because pickup point is the default
+// You need to pass the function an options object and a callback for when the user selects a pickup point
 // All possible options are in types.ts under PacketaWidgetOptions type
-packeta.openWidget({}, onPickupPointSelected);
+packeta.openWidget({ widgetType: "pickupPoint" }, onPickupPointSelected);
 
 // Widget closes automatically when the user clicks on the cross in the right corner, outside the popup, selects a pickup point or presses the escape key
 
@@ -64,10 +64,8 @@ function onDeliveryAddressSelected(adress: PacketaAddress) {
     console.log('Selected adress:', adress);
 }
 
-// I have created the 'custom' property to simplify some things in the original options object
-// For example if you wanted to get the home delivery popup you had to set layout to 'hd' which I found unintuitive
-// Also standard property carrierId is required for home delivery widgets as stated in the docs https://docs.packetery.com/07-home-delivery/01-impl-man.html#toc-hd-options
-packeta.openWidget({ custom: {widgetType: 'homeDelivery'}, carrierId: '80' }, onDeliveryAddressSelected);
+// Standard property carrierId is required for home delivery widgets as stated in the docs https://docs.packetery.com/07-home-delivery/01-impl-man.html#toc-hd-options
+packeta.openWidget({ widgetType: 'homeDelivery', carrierId: '80' }, onDeliveryAddressSelected);
 
 // Widget closes automatically when the user clicks on the cross in the right corner, outside the popup, selects a delivery address or presses the escape key
 ```
@@ -77,6 +75,6 @@ The packeta instance has a `closeWidget` method which closes the widget
 
 <hr>
 
-Apart from the custom extension of the options object the object stays the same and should support all properties specified in the documentation
+Apart from the new custom properties of the options object, the object properties are the same as in the documentation.
 
-If you don't want this library to take up two files you can just replace the imports in packeta.ts with the type definitions them selfs
+If you don't want this library to take up two files you can just replace the imports in packeta.ts with the type definitions themselves

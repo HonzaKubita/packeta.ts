@@ -11,15 +11,14 @@ export type PacketaVendor = {
 }
 
 // https://docs.packetery.com/01-pickup-point-selection/02-widget-v6.html#toc-options
-export type PacketaWidgetOptions = {
-    custom?: {
-        widgetType?: "pickupPoint" | "homeDelivery";
-        inline?: boolean;
-        parentElement?: HTMLElement;
-    };
-    apiKey?: string;
-    layout?: string;
-    carrierId?: string;
+export type PacketaStandardWidgetOptions = {
+    // Options for the pickup point widget
+    // Custom properties
+    widgetType: "pickupPoint" | "homeDelivery";
+    inline?: boolean;
+    parentElement?: HTMLElement;
+
+    // Standard options
     webUrl?: string;
     appIdentity?: string;
     vendors?: PacketaVendor[];
@@ -38,7 +37,36 @@ export type PacketaWidgetOptions = {
     expeditionDay?: string;
     defaultPrice?: string;
     centerExternalId?: string;
+
+    // Options not specified in the documentation but are required
+    apiKey?: string;
 }
+
+// https://docs.packetery.com/07-home-delivery/01-impl-man.html#toc-hd-options
+export type PacketaHDWidgetOptions = {
+    // Options for the home delivery widget
+    // Custom properties
+    widgetType: "pickupPoint" | "homeDelivery";
+    inline?: boolean;
+    parentElement?: HTMLElement;
+
+    // HD options
+    layout: string;
+    carrierId: string;
+    language?: string;
+    country?: string;
+    centerCountry?: string;
+    centerRegion?: string;
+    centerCity?: string;
+    centerPostcode?: string;
+    centerStreet?: string;
+    centerHouseNumber?: string;
+
+    // Options not specified in the documentation but are required
+    apiKey?: string;
+}
+
+export type PacketaWidgetOptions = PacketaStandardWidgetOptions | PacketaHDWidgetOptions
 
 // https://docs.packetery.com/01-pickup-point-selection/02-widget-v6.html#toc-time
 export type PacketaTime = {

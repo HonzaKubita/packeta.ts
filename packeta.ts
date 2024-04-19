@@ -1,4 +1,4 @@
-import type { PacketaWidgetOptions, PacketaWidgetCallback } from './types';
+import type { PacketaWidgetOptions, PacketaStandardWidgetOptions, PacketaHDWidgetOptions, PacketaWidgetCallback } from './types';
 
 const packetaUrls = {
     errorUrl: 'https://error-page-service-widget-errors.prod.packeta-com.codenow.com/',
@@ -45,28 +45,33 @@ function destroyWidget() {
     }
 }
 
-async function createWidget(options: PacketaWidgetOptions, callback: PacketaWidgetCallback) {
-    // Determine the type of widget to create (pickupPoint is the default)
-    const widgetType = options.custom?.widgetType || "pickupPoint";
+function isStandardOptions(options: PacketaWidgetOptions): options is PacketaStandardWidgetOptions {
+    return options.widgetType == "pickupPoint";
+}
 
+function isHDOptions(options: PacketaWidgetOptions): options is PacketaHDWidgetOptions {
+    return options.widgetType == "homeDelivery";
+}
+
+async function createWidget(options: PacketaWidgetOptions, callback: PacketaWidgetCallback) {
     // Set the layout option based on the widget type
     // Basically widgetType is replacement for this weird layout option
     // that's why is layout getting set depending on widgetType
-    if (widgetType == "homeDelivery") {
+    if (isHDOptions(options)) {
         options.layout = "hd";
     }
 
     // Check the health of the service based on the widget type
-    const serviceHealthy = await checkServiceHealth(widgetType);
+    const serviceHealthy = await checkServiceHealth(options.widgetType);
 
     // Determine the URL of the widget based on the health of the service
     let iframeUrl = "";
     if (serviceHealthy) {
         // Use the base URL if the service is healthy
-        iframeUrl = packetaUrls[widgetType].baseUrl;
+        iframeUrl = packetaUrls[options.widgetType].baseUrl;
     } else {
         // Use the backup URL if the service is not healthy
-        iframeUrl = packetaUrls[widgetType].backupUrl;
+        iframeUrl = packetaUrls[options.widgetType].backupUrl;
     }
 
     // Append the api version and start of the URL parameters to the URL
@@ -91,12 +96,12 @@ async function createWidget(options: PacketaWidgetOptions, callback: PacketaWidg
     iframe.setAttribute('style', 'width: 100%; height: 100%; border: none;');
 
     // Add the iframe to the document
-    if (options.custom?.inline) {
+    if (options.inline) {
         // If the widget is inline, append it to the parent element
-        if (!options.custom?.parentElement)
+        if (!options.parentElement)
             throw new Error("Parent element is required for inline widget");
 
-        const parentElement = options.custom?.parentElement;
+        const parentElement = options.parentElement;
         parentElement.appendChild(iframe);
     }
     else {
